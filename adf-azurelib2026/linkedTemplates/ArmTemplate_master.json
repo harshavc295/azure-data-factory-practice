@@ -1,0 +1,180 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-azurelib2026"
+		},
+		"LS_AzureSQL_DB_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_AzureSQL_DB'"
+		},
+		"ls_adls_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_adls'"
+		},
+		"ls_azure_sql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_azure_sql'"
+		},
+		"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-gpt-2026.vault.azure.net/"
+		},
+		"LS_AzureSQL_DB_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sql-azurelib2026.database.windows.net"
+		},
+		"LS_AzureSQL_DB_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "db-azurelib2026"
+		},
+		"LS_AzureSQL_DB_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "harshavc295"
+		},
+		"LS_AzureSQL_KV_Practice_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sql-azurelib2026.database.windows.net"
+		},
+		"LS_AzureSQL_KV_Practice_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "db-azurelib2026"
+		},
+		"LS_AzureSQL_KV_Practice_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "harshavc295"
+		},
+		"ls_adls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stacazurelib2026.dfs.core.windows.net"
+		},
+		"ls_azure_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sql-azurelib2026.database.windows.net"
+		},
+		"ls_azure_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "db-azurelib2026"
+		},
+		"ls_azure_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "harshavc295"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adf-azurelib2026_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"LS_AzureSQL_DB_password": {
+						"value": "[parameters('LS_AzureSQL_DB_password')]"
+					},
+					"ls_adls_accountKey": {
+						"value": "[parameters('ls_adls_accountKey')]"
+					},
+					"ls_azure_sql_password": {
+						"value": "[parameters('ls_azure_sql_password')]"
+					},
+					"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
+						"value": "[parameters('LS_AzureKeyVault_properties_typeProperties_baseUrl')]"
+					},
+					"LS_AzureSQL_DB_properties_typeProperties_server": {
+						"value": "[parameters('LS_AzureSQL_DB_properties_typeProperties_server')]"
+					},
+					"LS_AzureSQL_DB_properties_typeProperties_database": {
+						"value": "[parameters('LS_AzureSQL_DB_properties_typeProperties_database')]"
+					},
+					"LS_AzureSQL_DB_properties_typeProperties_userName": {
+						"value": "[parameters('LS_AzureSQL_DB_properties_typeProperties_userName')]"
+					},
+					"ls_adls_properties_typeProperties_url": {
+						"value": "[parameters('ls_adls_properties_typeProperties_url')]"
+					},
+					"ls_azure_sql_properties_typeProperties_server": {
+						"value": "[parameters('ls_azure_sql_properties_typeProperties_server')]"
+					},
+					"ls_azure_sql_properties_typeProperties_database": {
+						"value": "[parameters('ls_azure_sql_properties_typeProperties_database')]"
+					},
+					"ls_azure_sql_properties_typeProperties_userName": {
+						"value": "[parameters('ls_azure_sql_properties_typeProperties_userName')]"
+					},
+					"LS_AzureSQL_KV_Practice_properties_typeProperties_server": {
+						"value": "[parameters('LS_AzureSQL_KV_Practice_properties_typeProperties_server')]"
+					},
+					"LS_AzureSQL_KV_Practice_properties_typeProperties_database": {
+						"value": "[parameters('LS_AzureSQL_KV_Practice_properties_typeProperties_database')]"
+					},
+					"LS_AzureSQL_KV_Practice_properties_typeProperties_userName": {
+						"value": "[parameters('LS_AzureSQL_KV_Practice_properties_typeProperties_userName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "adf-azurelib2026_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf-azurelib2026_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "adf-azurelib2026_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf-azurelib2026_ArmTemplate_1')]"
+			]
+		}
+	]
+}
