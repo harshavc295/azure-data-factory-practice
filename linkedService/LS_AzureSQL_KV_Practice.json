@@ -1,0 +1,25 @@
+{
+	"name": "LS_AzureSQL_KV_Practice",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "sql-azurelib2026.database.windows.net",
+			"database": "db-azurelib2026",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "harshavc295",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_AzureKeyVault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "harshavc295",
+				"secretVersion": "b1a93ff430d542adaa36d1c90a1cc588"
+			}
+		}
+	}
+}

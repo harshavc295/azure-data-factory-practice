@@ -1,0 +1,101 @@
+{
+	"name": "PL_05_OrchestrationAndRecovery",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute_FullLoad",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_01_FullLoad",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Log_Failure",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Execute_FullLoad",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_DB",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "INSERT INTO dbo.ADF_RunLog\n(\n    PipelineName,\n    PipelineRunID,\n    SourceTable,\n    Status,\n    StartTime,\n    EndTime,\n    ErrorMessage\n)\nVALUES\n(\n    'PL_05_OrchestrationAndRecovery',\n    '@{pipeline().RunId}',\n    'Customer',\n    'FAILED',\n    SYSUTCDATETIME(),\n    SYSUTCDATETIME(),\n    'Child pipeline PL_01_FullLoad failed. Check child activity output for details.'\n);",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Log_Success",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Execute_FullLoad",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_DB",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "\nINSERT INTO dbo.ADF_RunLog\n(\n    PipelineName,\n    PipelineRunID,\n    SourceTable,\n    Status,\n    StartTime,\n    EndTime,\n    ErrorMessage\n)\nVALUES\n(\n    'PL_05_OrchestrationAndRecovery',\n    '@{pipeline().RunId}',\n    'Customer',\n    'SUCCEEDED',\n    SYSUTCDATETIME(),\n    SYSUTCDATETIME(),\n    NULL\n);\n",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"folder": {
+			"name": "5_important_Pipelines"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-10-16T17:15:37Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

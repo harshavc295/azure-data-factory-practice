@@ -1,0 +1,15 @@
+{
+	"name": "adf-azurelib2026",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "b3cff2e8-dd00-4971-8f93-35eda3e8572a",
+		"tenantId": "07f15eb0-35c6-4f9b-966a-bd73598f8149"
+	}
+}

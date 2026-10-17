@@ -1,0 +1,131 @@
+{
+	"name": "one common pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "get the tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT Table_name from information_schema.tables where table_schema='salesLT'\nand Table_name in ('Customer', 'Product', 'CustomerAddress')",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "SalesLT",
+							"table": "customer"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "get the tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('get the tables').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sql_generic",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": "SalesLT",
+										"table": {
+											"value": "@item().Table_name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_generic",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderpath": {
+											"value": "@concat(\n    item().Table_name,\n    '/',\n    formatDateTime(convertFromUtc(utcNow(),'India Standard Time'),'yyyy'),\n    '/',\n    formatDateTime(convertFromUtc(utcNow(),'India Standard Time'),'MM'),\n    '/',\n    formatDateTime(convertFromUtc(utcNow(),'India Standard Time'),'dd')\n)",
+											"type": "Expression"
+										},
+										"filename": {
+											"value": "@item().Table_name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "Assignment  : ADF pipeline : 3"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-08-12T06:08:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,169 @@
+{
+	"name": "PL_04_IncrementalLoad",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup_CustomerWatermark",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT LastWatermarkValue\nFROM dbo.ADF_TableConfig\nWHERE SourceSchema = 'dbo'\n  AND SourceTable = 'Customer'\n  AND IsActive = 1;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_Customer_Source",
+						"type": "DatasetReference",
+						"parameters": {
+							"pTableName": "dbo.ADF_TableConfig"
+						}
+					}
+				}
+			},
+			{
+				"name": "Copy_IncrementalCustomers",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Lookup_CustomerWatermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@if(\n    equals(activity('Lookup_CustomerWatermark').output.firstRow.LastWatermarkValue, null),\n    'SELECT CustomerID, CustomerName, City, ModifiedDate FROM dbo.Customer',\n    concat(\n        'SELECT CustomerID, CustomerName, City, ModifiedDate FROM dbo.Customer WHERE ModifiedDate > ''',\n        activity('Lookup_CustomerWatermark').output.firstRow.LastWatermarkValue,\n        ''''\n    )\n)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_SQL_Customer_Source",
+						"type": "DatasetReference",
+						"parameters": {
+							"pTableName": "dbo.Customer"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_SQL_Customer_Sink",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Lookup_NewWatermark",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Copy_IncrementalCustomers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT MAX(ModifiedDate) AS NewWatermark\nFROM dbo.Customer;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_Customer_Source",
+						"type": "DatasetReference",
+						"parameters": {
+							"pTableName": "dbo.Customer"
+						}
+					}
+				}
+			},
+			{
+				"name": "Update_CustomerWatermark",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Lookup_NewWatermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_DB",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "UPDATE dbo.ADF_TableConfig\nSET LastWatermarkValue =\n    (SELECT MAX(ModifiedDate) FROM dbo.Customer),\n    UpdatedAt = SYSUTCDATETIME()\nWHERE SourceSchema = 'dbo'\n  AND SourceTable = 'Customer';"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"folder": {
+			"name": "5_important_Pipelines"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-10-16T17:15:36Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

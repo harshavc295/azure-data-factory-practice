@@ -1,0 +1,25 @@
+{
+	"name": "DS_SQL_DynamicSink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AzureSQL_DB",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pTableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().pTableName",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

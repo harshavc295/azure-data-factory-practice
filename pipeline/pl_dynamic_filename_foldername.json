@@ -1,0 +1,74 @@
+{
+	"name": "pl_dynamic_filename_foldername",
+	"properties": {
+		"activities": [
+			{
+				"name": "copy db to storage",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_sql_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "SalesLT",
+							"table": "Product"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderpath": {
+								"value": "Product/@{formatDateTime(utcNow(),'yyyy')}/@{formatDateTime(utcNow(),'MM')}",
+								"type": "Expression"
+							},
+							"filename": {
+								"value": "Product_@{formatDateTime(utcNow(),'hh')}_@{formatDateTime(utcNow(),'mm')}",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-08-11T03:04:42Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

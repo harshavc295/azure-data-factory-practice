@@ -1,0 +1,94 @@
+{
+	"name": "pl_sql_to_parquet",
+	"properties": {
+		"activities": [
+			{
+				"name": "fe_db_all_tables",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@createArray(\n    json('{\"schema\":\"SalesLT\",\"table\":\"Address\",\"folderpath\":\"customer\",\"fileName\":\"Address.parquet\"}'),\n    json('{\"schema\":\"SalesLT\",\"table\":\"Customer\",\"folderpath\":\"customer\",\"fileName\":\"Customer.parquet\"}'),\n    json('{\"schema\":\"SalesLT\",\"table\":\"CustomerAddress\",\"folderpath\":\"customer\",\"fileName\":\"CustomerAddress.parquet\"}'),\n    json('{\"schema\":\"SalesLT\",\"table\":\"Product\",\"folderpath\":\"product\",\"fileName\":\"Product.parquet\"}'),\n    json('{\"schema\":\"SalesLT\",\"table\":\"ProductCategory\",\"folderpath\":\"product\",\"fileName\":\"ProductCategory.parquet\"}'),\n    json('{\"schema\":\"SalesLT\",\"table\":\"ProductDescription\",\"folderpath\":\"product\",\"fileName\":\"ProductDescription.parquet\"}'),\n    json('{\"schema\":\"SalesLT\",\"table\":\"ProductModel\",\"folderpath\":\"product\",\"fileName\":\"ProductModel.parquet\"}'),\n    json('{\"schema\":\"SalesLT\",\"table\":\"ProductModelProductDescription\",\"folderpath\":\"product\",\"fileName\":\"ProductModelProductDescription.parquet\"}'),\n    json('{\"schema\":\"SalesLT\",\"table\":\"SalesOrderDetail\",\"folderpath\":\"sales\",\"fileName\":\"SalesOrderDetail.parquet\"}'),\n    json('{\"schema\":\"SalesLT\",\"table\":\"SalesOrderHeader\",\"folderpath\":\"sales\",\"fileName\":\"SalesOrderHeader.parquet\"}')\n)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy all the tables table to parquet",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sql_generic",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@item().schema",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@item().table",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_generic",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderpath": {
+											"value": "@item().folderpath",
+											"type": "Expression"
+										},
+										"filename": {
+											"value": "@item().fileName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-08-10T12:37:01Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

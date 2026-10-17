@@ -1,0 +1,129 @@
+{
+	"name": "Without_Foreach_Example",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy Customer data",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_sql_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "SalesLT",
+							"table": "Customer "
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderpath": "Customer",
+							"filename": "Customer"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy customeraddress table",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_sql_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "SalesLT",
+							"table": "CustomerAddress"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderpath": "CustomerAddress",
+							"filename": "CustomerAddress"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Assignment  : ADF pipeline : 3"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-08-12T06:01:40Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

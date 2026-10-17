@@ -1,0 +1,71 @@
+{
+	"name": "PL_02_ParameterizedLoad",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy Data",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_SQL_Customer_Source",
+						"type": "DatasetReference",
+						"parameters": {
+							"pTableName": {
+								"value": "@pipeline().parameters.pTableName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_SQL_Customer_Sink",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"pTableName": {
+				"type": "string",
+				"defaultValue": "Customer"
+			}
+		},
+		"folder": {
+			"name": "5_important_Pipelines"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-10-16T17:15:36Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

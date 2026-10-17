@@ -1,0 +1,72 @@
+{
+	"name": "Ingestion_Customer_JOIN_ADLS",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy customer data along with their address",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT\n    CONCAT_WS(' ', firstname, lastname) AS CustomerFullName,\n    CA.addressId AS AddressID\nFROM SalesLT.Customer AS C\nINNER JOIN SalesLT.CustomerAddress AS CA\n    ON C.customerid = CA.customerid",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_sql_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "SalesLT",
+							"table": "customer"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_parquet_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderpath": "Customer",
+							"filename": "Customeraddressfullname"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Assignment 5 : ADF pipeline : 2"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-08-12T04:26:07Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
