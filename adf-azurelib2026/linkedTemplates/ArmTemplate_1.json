@@ -490,6 +490,7 @@
 				"activities": [
 					{
 						"name": "Copy Data",
+						"description": "This is a Parameterized Pipeline",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
