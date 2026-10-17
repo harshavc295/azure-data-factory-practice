@@ -4,6 +4,7 @@
 		"activities": [
 			{
 				"name": "Copy_Customer",
+				"description": "Git practice: updated on feature branch",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
